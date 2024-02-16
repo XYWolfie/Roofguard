@@ -11,7 +11,7 @@ screen = pygame.display.set_mode((800, 600))
 
 
 RESOLUTION = 800, 600
-FPS = 60
+FPS = 10
 TILESIZE = 32
 PLAYER_SPEED = 400
 FALLING_SPEED = 200
@@ -19,6 +19,9 @@ ANIM_THRESHOLD = 0.05
 
 black = (0, 0, 0)
 red = (73, 12, 15)
+
+comic_sans50 = pygame.font.SysFont("Comic Sans MS", 50) 
+game_over_text = comic_sans50.render("Game over, click R to restart", False, (red))
 
 def text_objects(text, font):
     textSurface = font.render(text, True, black)
@@ -43,13 +46,15 @@ carimg3 = pygame.image.load("car.png")
 carimg3 = pygame.transform.scale(carimg, (345, 120))
 
 b_carimg = pygame.image.load("burning_car.png")
-b_carimg = pygame.transform.scale(b_carimg, (207, 147))
+b_carimg = pygame.transform.scale(b_carimg, (345, 245))
 
-
+tileimg = pygame.image.load("tile.png")
+tileimg = pygame.transform.scale(tileimg, (45, 80))
 
 broken = False
 hit = 0
 howmany = 0
+
 
 bg = pygame.image.load("bg.png")
 bg = pygame.transform.scale(bg, (800, 600))
@@ -108,8 +113,7 @@ class Player(pygame.sprite.Sprite):
 class FallingStuff(pygame.sprite.Sprite):
     def __init__(self, pos, *grps):
         super().__init__(*grps)
-        self.image = pygame.Surface((TILESIZE, TILESIZE))
-        self.image.fill(red)
+        self.image = tileimg
         self.rect = self.image.get_rect(topleft=pos)
 
         
@@ -118,17 +122,50 @@ class FallingStuff(pygame.sprite.Sprite):
         display_rect = pygame.display.get_surface().get_rect()
         broken == False
         hit = 0
-        if self.rect.top > 515:
-            self.kill()
-            hit = hit + 1
-            broken == True
-            screen.blit(b_carimg, (3,3))
-            print ("meow")
-            
-            
+        if self.rect.top > 500:
+            if self.rect.left < 200:
+                self.kill()
+                hit = hit + 1
+                broken == True
+                screen.blit(b_carimg, (-150,340))
+                
+                print ("meow")
+                font = pygame.freetype.SysFont('comic sans', 80)
+                font.render_to(screen, (150, 250), f'GAME OVER', 'red')
+        
+                pygame.display.update()
 
-            pygame.display.update()
-     
+                pygame.time.wait(5000)
+                end()
+
+            if self.rect.left > 600:
+                self.kill()
+                hit = hit + 1
+                broken == True
+                screen.blit(b_carimg, (580,340))
+                
+                print ("meow")
+                font = pygame.freetype.SysFont('comic sans', 80)
+                font.render_to(screen, (100, 250), f'GAME OVER', 'red')
+        
+                pygame.display.update()
+
+                pygame.time.wait(5000)
+                end()
+            else:
+                self.kill()
+                hit = hit + 1
+                broken == True
+                screen.blit(b_carimg, (215,340))
+                
+                print ("meow")
+                font = pygame.freetype.SysFont('comic sans', 80)
+                font.render_to(screen, (100, 250), f'GAME OVER', 'red')
+        
+                pygame.display.update()
+
+                pygame.time.wait(5000)
+                end()
 
 
 
@@ -155,7 +192,7 @@ def main():
                 return
             if e.type == CREATE_STUFF:
                 pygame.time.set_timer(CREATE_STUFF, randint(1000, 2000), True)
-                FallingStuff((randint(50, 550), -TILESIZE), falling_stuff, sprites)
+                FallingStuff((randint(50, 750), -TILESIZE), falling_stuff, sprites)
         
         screen.fill(black)
         screen.blit(bg, (0, 0))
@@ -171,7 +208,14 @@ def main():
         pygame.display.update()
         
         
-
+def end():
+    
+    screen.fill(black)
+    comic_sans50.render("Game over, click R to restart", False, ('red'))
+    pygame.quit()
+    
+    
+                       
 
 if __name__ == "__main__":
     main()
