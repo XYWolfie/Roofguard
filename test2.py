@@ -7,7 +7,6 @@ screen_width = 640
 screen_height = 480
 bg_color = ((100, 0, 200))
 
-screen = pg.display.set_mode((screen_width,screen_height))
 
 character = pg.image.load("Black-Rectangle-PNG.png") #characterleft0
 character = pg.transform.scale(character, (45,60)) 
@@ -55,7 +54,7 @@ class Character(pg.sprite.Sprite):
 def run_game():
     pg.init()
     clock = pg.time.Clock()
-    bg_settings = ((screen_width, screen_height))
+    bg_settings = Settings()
     screen = pg.display.set_mode(
         (bg_settings.screen_width, bg_settings.screen_height))
     while True:

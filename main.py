@@ -20,6 +20,7 @@ ANIM_THRESHOLD = 0.05
 
 black = (0, 0, 0)
 red = (73, 12, 15)
+white = (255, 255, 255)
 
 txt = pygame.freetype.Font("prstart.ttf", 34)
 game_over_text = txt.render("Game over, click R to restart", False, ('red'))
@@ -56,27 +57,33 @@ broken = False
 hit = 0
 howmany = 0
 
+score = 0
+
 game_state = "start_menu"
 
 bg = pygame.image.load("bg.png")
 bg = pygame.transform.scale(bg, (800, 600))
 
 def draw_start_menu():
-    screen.fill((0, 0, 0))
-    font = pygame.font.SysFont('arial', 40)
-    title = font.render('Roofguard', True, (255, 255, 255))
-    start_button = font.render("press 'space' to start", True, (255, 255, 255))
-    screen.blit(title, (800/2 - title.get_width()/2, 600/2 - title.get_height()/2))
-    screen.blit(start_button, (800/2 - start_button.get_width()/2, 600/2 + start_button.get_height()/2))
-    pygame.display.update()
+    logo = pygame.image.load("RoofGuard-logo.png")
+    logo = pygame.transform.scale(logo, (792, 350))
+    screen.fill((white))
+    font2 = pygame.font.SysFont('arial', 40)
+    font = pygame.freetype.Font("prstart.ttf", 24)
+    font.render_to(screen, (160, 450), f"press 'space' to start", 'black')
+    #font.render_to(screen, (260, 490), f"to start", 'black')
+    screen.blit(logo, (800/2 - logo.get_width()/2, 100))
+    
+    pygame.display.update() 
 
 def draw_game_over_screen():
     screen.fill((0, 0, 0))
-    font = pygame.font.SysFont('arial', 40)
-    restart_button = font.render('R - Restart', True, (255, 255, 255))
-    quit_button = font.render('Q - Quit', True, (255, 255, 255))
-    screen.blit(restart_button, (800/2 - restart_button.get_width()/2, 600/1.9 + restart_button.get_height()))
-    screen.blit(quit_button, (800/2 - quit_button.get_width()/2, 600/2 + quit_button.get_height()/2))
+    font = pygame.freetype.Font("prstart.ttf", 24)
+    global score
+    txt.render_to(screen, (180, 150), f'Your score: {score}', 'white')
+    
+    font.render_to(screen, (160, 350), f"press 'R' to restart", 'white')
+    
     pygame.display.update()
 
 
@@ -99,15 +106,14 @@ while True:
        keys = pygame.key.get_pressed()
        if keys[pygame.K_r]:
            game_state = "start_menu"
-       if keys[pygame.K_q]:
-           pygame.quit()
-           quit()
   
    elif game_state == "game":
        
     class Player(pygame.sprite.Sprite):
         def __init__(self, pos, falling_stuff, *grps):
             super().__init__(*grps)
+
+            global score
 
             self.images = []
 
@@ -122,7 +128,7 @@ while True:
             self.animation_counter = 0
             self.rect = self.image.get_rect(topleft=pos)
             self.falling_stuff = falling_stuff
-            self.score = 0
+            score = 0
             self.hitbox = pygame.Rect(0, 0, 130, 40)
             self.hitbox.center = self.rect.center
             self.hitbox.move_ip(-10, -10)
@@ -136,7 +142,7 @@ while True:
             if pressed[pygame.K_d]: d += 1
             global FALLING_SPEED
             global PLAYER_SPEED
-                
+            global score
 
             self.rect.move_ip(d * dt * PLAYER_SPEED, 0)
             display_rect = pygame.display.get_surface().get_rect()
@@ -146,42 +152,42 @@ while True:
             for stuff in self.falling_stuff:
                 if self.hitbox.colliderect(stuff.rect):
                     stuff.kill()
-                    self.score += 1
+                    score += 1
 
-                    if self.score >= 5:
+                    if score >= 5:
                         PLAYER_SPEED = 450
                         FALLING_SPEED = 250
-                    if self.score >= 10:
+                    if score >= 10:
                         PLAYER_SPEED = 500
                         FALLING_SPEED = 300
-                    if self.score >= 15:
+                    if score >= 15:
                         PLAYER_SPEED = 550
                         FALLING_SPEED = 350
-                    if self.score >= 20:
+                    if score >= 20:
                         PLAYER_SPEED = 600
                         FALLING_SPEED = 400
-                    if self.score >= 25:
+                    if score >= 25:
                         PLAYER_SPEED = 650
                         FALLING_SPEED = 450
-                    if self.score >= 30:
+                    if score >= 30:
                         PLAYER_SPEED = 700
                         FALLING_SPEED = 500
-                    if self.score >= 35:
+                    if score >= 35:
                         PLAYER_SPEED = 750
                         FALLING_SPEED = 550
-                    if self.score >= 40:
+                    if score >= 40:
                         PLAYER_SPEED = 800
                         FALLING_SPEED = 600
-                    if self.score >= 45:
+                    if score >= 45:
                         PLAYER_SPEED = 850
                         FALLING_SPEED = 650
-                    if self.score >= 50:
+                    if score >= 50:
                         PLAYER_SPEED = 900
                         FALLING_SPEED = 700
-                    if self.score >= 55:
+                    if score >= 55:
                         PLAYER_SPEED = 950
                         FALLING_SPEED = 750
-                    if self.score >= 60:
+                    if score >= 60:
                         PLAYER_SPEED = 1000
                         FALLING_SPEED = 800
 
@@ -293,7 +299,7 @@ while True:
                     
                     screen.fill(black)
                     screen.blit(bg, (0, 0))
-                    txt.render_to(screen, (20, 20), f'Score: {player.score}', 'black')
+                    txt.render_to(screen, (20, 20), f'Score: {score}', 'black')
                     sprites.draw(screen)
                     screen.blit(carimg, (-150,465))
                     screen.blit(carimg2, (215,465))
@@ -328,9 +334,7 @@ while True:
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_r]:
                     game_state = "start_menu"
-                if keys[pygame.K_q]:
-                    pygame.quit()
-                    quit()
+                
 
     
 
