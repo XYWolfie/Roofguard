@@ -4,7 +4,6 @@ import os
 from random import choice, randint
 from itertools import cycle
 from pygame import mixer
-from sprites import *
 pygame.init()
 
 screen = pygame.display.set_mode((800, 600))
@@ -17,6 +16,12 @@ TILESIZE = 32
 PLAYER_SPEED = 400
 FALLING_SPEED = 200
 ANIM_THRESHOLD = 0.05
+
+window = 0
+
+game_start = True
+game_playing = False
+game_over = False
 
 black = (0, 0, 0)
 red = (73, 12, 15)
@@ -53,15 +58,7 @@ b_carimg = pygame.transform.scale(b_carimg, (345, 245))
 tileimg = pygame.image.load("tile.png")
 tileimg = pygame.transform.scale(tileimg, (45, 80))
 
-broken = False
-hit = 0
-howmany = 0
-
 score = 0
-
-game_over = False
-
-game_state = "start_menu"
 
 bg = pygame.image.load("bg.png")
 bg = pygame.transform.scale(bg, (800, 600))
@@ -75,46 +72,23 @@ def draw_start_menu():
     #font.render_to(screen, (260, 490), f"to start", 'black')
     screen.blit(logo, (800/2 - logo.get_width()/2, 200))
     
-    pygame.display.update() 
+    
+    pygame.display.update()  
 
-def draw_game_over_screen():
-    global game_over
-    
-    screen.fill((0, 0, 0))
+def draw_game_over():
+    screen.fill((black))
     font = pygame.freetype.Font("prstart.ttf", 24)
-    global score
-    txt.render_to(screen, (180, 150), f'Your score: {score}', 'white')
-    
-    font.render_to(screen, (160, 350), f"press 'R' to restart", 'white')
-    
-    game_over = True
+    font.render_to(screen, (160, 450), f"Press 'r to restart", 'white')
+    txt.render_to(screen, (20, 20), f' Your score: {score}', 'white')
 
     pygame.display.update()
-
-
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            quit()
-    if game_state == "start_menu":
-        draw_start_menu()
-        keys = pygame.key.get_pressed()
-        if- keys[pygame.K_SPACE]:
-            player_x = 200
-            player_y = 400
-            game_state = "game"
-            game_over = False
-
-    elif game_state == "game_over":
-        draw_game_over_screen()
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_r]:
-            game_state = "start_menu"
     
-    elif game_state == "game":
 
-       
+
+def playing():
+    while game_playing == True:
+        pygame.init()
+                     
         class Player(pygame.sprite.Sprite):
             def __init__(self, pos, falling_stuff, *grps):
                 super().__init__(*grps)
@@ -160,196 +134,190 @@ while True:
                         stuff.kill()
                         score += 1
 
-                        if score >= 5:
+                        if score >= 0:
                             PLAYER_SPEED = 450
+                            FALLING_SPEED = 200
+                        if score >= 5:
+                            PLAYER_SPEED = 500
                             FALLING_SPEED = 250
                         if score >= 10:
-                            PLAYER_SPEED = 500
+                            PLAYER_SPEED = 550
                             FALLING_SPEED = 300
                         if score >= 15:
-                            PLAYER_SPEED = 550
+                            PLAYER_SPEED = 600
                             FALLING_SPEED = 350
                         if score >= 20:
-                            PLAYER_SPEED = 600
+                            PLAYER_SPEED = 650
                             FALLING_SPEED = 400
                         if score >= 25:
-                            PLAYER_SPEED = 650
+                            PLAYER_SPEED = 700
                             FALLING_SPEED = 450
                         if score >= 30:
-                            PLAYER_SPEED = 700
+                            PLAYER_SPEED = 750
                             FALLING_SPEED = 500
                         if score >= 35:
-                            PLAYER_SPEED = 750
+                            PLAYER_SPEED = 800
                             FALLING_SPEED = 550
                         if score >= 40:
-                            PLAYER_SPEED = 800
+                            PLAYER_SPEED = 850
                             FALLING_SPEED = 600
                         if score >= 45:
-                            PLAYER_SPEED = 850
+                            PLAYER_SPEED = 900
                             FALLING_SPEED = 650
                         if score >= 50:
-                            PLAYER_SPEED = 900
+                            PLAYER_SPEED = 950
                             FALLING_SPEED = 700
                         if score >= 55:
-                            PLAYER_SPEED = 950
-                            FALLING_SPEED = 750
-                        if score >= 60:
                             PLAYER_SPEED = 1000
-                            FALLING_SPEED = 800
+                            FALLING_SPEED = 750
 
                 self.hitbox.center = self.rect.center
                 self.hitbox.move_ip(5 if self.direction == 'LEFT' else 10, 10)
 
                 pygame.display.update()
-                    
-                
+
+            pygame.display.update()
 
         class FallingStuff(pygame.sprite.Sprite):
-                def __init__(self, pos, *grps):
-                    super().__init__(*grps)
-                    self.image = tileimg
-                    self.rect = self.image.get_rect(topleft=pos)
-                    
-
-                    
-                def update(self, dt, events):
-                    global display_rect
-                    self.rect.move_ip(0, FALLING_SPEED * dt)
-                    display_rect = pygame.display.get_surface().get_rect()
-                    broken == False
-                    hit = 0
-                    global game_over
-                    global game_state
-
-                    if self.rect.top > 500:
-                        if self.rect.left < 200:
-                            self.kill()
-                            hit = hit + 1
-                            broken == True
-                            screen.blit(b_carimg, (-150,340))
-                            
-                        
-                            font = pygame.freetype.Font("prstart.ttf", 64)
-                            font.render_to(screen, (100, 250), f'GAME OVER', 'red')
-                    
-                            pygame.display.update()
-                            pygame.time.wait (5000)
-                            
-                            game_over = True
-                            game_state = "game_over"
-                            main()
-
-                            
-
-                        if self.rect.left > 600:
-                            self.kill()
-                            hit = hit + 1
-                            broken == True
-                            screen.blit(b_carimg, (580,340))
-                            
-                            
-                            font = pygame.freetype.Font("prstart.ttf", 64)
-                            font.render_to(screen, (100, 250), f'GAME OVER', 'red')
-                    
-                            pygame.display.update()
-                            pygame.time.wait (5000)
-
-                            game_over = True
-                            game_state = "game_over"
-                            main()
-                    
-
-                        else:
-                            self.kill()
-                            hit = hit + 1
-                            broken == True
-                            screen.blit(b_carimg, (215,340))
-                            
-                        
-                            font = pygame.freetype.Font("prstart.ttf", 64)
-                            font.render_to(screen, (100, 250), f'GAME OVER', 'red')
-                    
-                            pygame.display.update()
-                            pygame.time.wait (5000)
-                            
-                            game_over = True
-                            game_state = "game_over"
-                            main()
+            def __init__(self, pos, *grps):
+                super().__init__(*grps)
+                self.image = tileimg
+                self.rect = self.image.get_rect(topleft=pos)
 
 
+            def update(self, dt, events):
+                global game_playing
+                global game_over
+                global display_rect
+                self.rect.move_ip(0, FALLING_SPEED * dt)
+                display_rect = pygame.display.get_surface().get_rect()
+                global window
 
-        def main():
 
-                pygame.init()
-                global game_state
-                global font
-                screen = pygame.display.set_mode(RESOLUTION)          
-                if game_state == ("game"):
-                    dt, clock = 0, pygame.time.Clock()
-                    sprites = pygame.sprite.Group()
-                    falling_stuff = pygame.sprite.Group()
-                    player = Player((300, 360), falling_stuff, sprites)
-                    
-                    font = pygame.freetype.SysFont('txt', 40)
-
-                    CREATE_STUFF = pygame.USEREVENT + 1
-                    pygame.time.set_timer(CREATE_STUFF, randint(1000, 2000), True)
-                    while True:
-                        events = pygame.event.get()
-                        for e in events:
-                            if e.type == pygame.QUIT:
-                                return
-                            if e.type == CREATE_STUFF:
-                                pygame.time.set_timer(CREATE_STUFF, randint(1000, 2000), True)
-                                FallingStuff((randint(50, 750), -TILESIZE), falling_stuff, sprites)
-                        
-                        screen.fill(black)
-                        screen.blit(bg, (0, 0))
-                        txt.render_to(screen, (20, 20), f'Score: {score}', 'black')
-                        sprites.draw(screen)
-                        screen.blit(carimg, (-150,465))
-                        screen.blit(carimg2, (215,465))
-                        screen.blit(carimg3, (580,465))
-                        sprites.update(dt, events)
-                        pygame.display.flip()
-                        dt = clock.tick(FPS) / 1000
-
+                if self.rect.top > 500:
+                    if self.rect.left < 200:
+                        self.kill()
+                        screen.blit(b_carimg, (-150,340))
+                                            
+                        font = pygame.freetype.Font("prstart.ttf", 64)
+                        font.render_to(screen, (100, 250), f'GAME OVER', 'red')
+                
                         pygame.display.update()
-                    
-                    
-                if game_state == "start_menu":
-                    draw_start_menu()
-                if game_state == "game_over":
-                    draw_game_over_screen()
-                    pygame.display.update()
+                        pygame.time.wait (3500)
+                        game_playing = False
+                        game_over = True
+                        window = 2
                         
+                               
 
-                if game_state == "start_menu":
-                    global player_x
-                    global player_y
-                    global game_over
-                    keys = pygame.key.get_pressed()
-                    if keys[pygame.K_SPACE]:
-                        game_state = "game"
-                        player_x = 200
-                        player_y = 400
-                        game_state = "game"
-                        game_over = False
+                    elif self.rect.left > 600:
+                        self.kill()
+                        screen.blit(b_carimg, (580,340))            
+                        
+                        font = pygame.freetype.Font("prstart.ttf", 64)
+                        font.render_to(screen, (100, 250), f'GAME OVER', 'red')
+                
+                        pygame.display.update()
+                        pygame.time.wait (3500)
+                        game_playing = False
+                        game_over = True
+                        window = 2
+                
 
-                if game_state == "game_over":
-                    keys = pygame.key.get_pressed()
-                    if keys[pygame.K_r]:
-                        game_state = "start_menu"
+
+                    else:
+                        self.kill()
+                        screen.blit(b_carimg, (215,340))
+                        
                     
+                        font = pygame.freetype.Font("prstart.ttf", 64)
+                        font.render_to(screen, (100, 250), f'GAME OVER', 'red')
 
+                
+                        pygame.display.update()
+                        pygame.time.wait (3500)
+                        game_playing = False
+                        game_over = True
+                        window = 2
+                        
         
+        global font
+        screen = pygame.display.set_mode(RESOLUTION)          
+        dt, clock = 0, pygame.time.Clock()
+        sprites = pygame.sprite.Group()
+        falling_stuff = pygame.sprite.Group()
+        player = Player((300, 360), falling_stuff, sprites)
+        
+        font = pygame.freetype.SysFont('txt', 40)
 
-        if __name__ == "__main__":
-            main()
-    
-        elif game_over:
-            game_state = "game_over"
+        CREATE_STUFF = pygame.USEREVENT + 1
+        pygame.time.set_timer(CREATE_STUFF, randint(1000, 2000), True)
+        while True:
+            events = pygame.event.get()
+            for e in events:
+                if e.type == pygame.QUIT:
+                    return
+                if e.type == CREATE_STUFF:
+                    pygame.time.set_timer(CREATE_STUFF, randint(1000, 2000), True)
+                    FallingStuff((randint(50, 750), -TILESIZE), falling_stuff, sprites)
+            
+            screen.fill(black)
+            screen.blit(bg, (0, 0))
+            txt.render_to(screen, (20, 20), f'Score: {score}', 'black')
+            sprites.draw(screen)
+            screen.blit(carimg, (-150,465))
+            screen.blit(carimg2, (215,465))
+            screen.blit(carimg3, (580,465))
+            sprites.update(dt, events)
+            pygame.display.flip()
+            dt = clock.tick(FPS) / 1000
+
+def start():
+    global game_start
+    global game_playing
+    while game_start == True:
+        global player_x
+        global player_y
+        global window 
+        draw_start_menu()
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE]:
+            player_x = 200
+            player_y = 400
+            game_start = False
+            game_playing = True
+            window = 1            
+
+def gameover():
+    global game_over
+    global game_start
+    while gameover == True:
+        global window 
+        draw_game_over()
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_r]:
             game_over = False
+            game_start = True
+            window = 0
 
-                    
 
+            
+
+
+
+def main():
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
+    while True:
+        if window == 0:
+            start()
+        
+        elif window == 1:
+            playing()
+
+        elif window == 2:
+            gameover()
+
+main()
